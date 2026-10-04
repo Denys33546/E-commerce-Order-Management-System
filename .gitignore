@@ -1,0 +1,30 @@
+# Виртуальные окружения и кэш Python
+.venv/
+venv/
+env/
+.env
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Настройки PyCharm и VS Code
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Локальные базы данных, тома и логи Docker
+*.db
+*.sqlite3
+postgres_data/
+*.log
+
+# Файлы операционной системы Mac
+.DS_Store
+.AppleDouble
+.LSOverride

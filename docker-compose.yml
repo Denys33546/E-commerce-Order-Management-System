@@ -1,0 +1,112 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: ecommerce_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ecommerce_network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: ecommerce_rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    networks:
+      - ecommerce_network
+
+  user_service:
+    build: ./user_service
+    container_name: ecommerce_user_service
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:postgrespassword@postgres:5432/postgres
+    depends_on:
+      - postgres
+    networks:
+      - ecommerce_network
+
+  product_service:
+    build: ./product_service
+    container_name: ecommerce_product_service
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:postgrespassword@postgres:5432/postgres
+    depends_on:
+      - postgres
+    networks:
+      - ecommerce_network
+
+  order_service:
+    build: ./order_service
+    container_name: ecommerce_order_service
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql+psycopg://postgres:postgrespassword@postgres:5432/postgres
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks:
+      - ecommerce_network
+
+  notification_worker:
+    build: ./notification_worker
+    container_name: ecommerce_notification_worker
+    restart: always
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - PYTHONPATH=/app
+    depends_on:
+      - rabbitmq
+    networks:
+      - ecommerce_network
+
+  nginx_gateway:
+    image: nginx:alpine
+    container_name: ecommerce_nginx_gateway
+    restart: always
+    volumes:
+      - ./api_gateway/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8000:8000"
+    depends_on:
+      - user_service
+      - product_service
+      - order_service
+    networks:
+      - ecommerce_network
+
+  telegram_bot:
+    build: ./telegram_bot
+    container_name: ecommerce_telegram_bot
+    restart: always
+    environment:
+      - TG_TOKEN=${TG_TOKEN}
+      - API_GATEWAY_URL=http://nginx_gateway:8000
+    depends_on:
+      - nginx_gateway
+    networks:
+      - ecommerce_network
+
+
+networks:
+  ecommerce_network:
+    driver: bridge
+
+volumes:
+  postgres_data:

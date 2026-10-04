@@ -1,0 +1,4 @@
+aiogram==3.*
+python-dotenv
+httpx>=0.25.0
+pydantic>=2.6.0

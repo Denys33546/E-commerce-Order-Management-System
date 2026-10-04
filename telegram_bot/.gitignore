@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Виртуальное окружение
+.venv/
+env/
+venv/
+ENV/
+
+# Логи
+*.log
+
+# Файлы базы данных
+*.sqlite3
+*.db
+
+# Файлы настроек IDE
+.vscode/
+.idea/
+
+# Конфиденциальные файлы
+.env
