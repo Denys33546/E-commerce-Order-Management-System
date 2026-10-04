@@ -31,6 +31,8 @@ services:
     build: ./user_service
     container_name: ecommerce_user_service
     restart: always
+    ports:
+      - "8001:8001"  # ИСПРАВЛЕНО: Выводим Swagger наружу на Mac
     environment:
       - DATABASE_URL=postgresql+psycopg://postgres:postgrespassword@postgres:5432/postgres
     depends_on:
@@ -42,6 +44,8 @@ services:
     build: ./product_service
     container_name: ecommerce_product_service
     restart: always
+    ports:
+      - "8002:8002"  # ИСПРАВЛЕНО: Выводим каталог наружу на Mac
     environment:
       - DATABASE_URL=postgresql+psycopg://postgres:postgrespassword@postgres:5432/postgres
     depends_on:
@@ -53,6 +57,8 @@ services:
     build: ./order_service
     container_name: ecommerce_order_service
     restart: always
+    ports:
+      - "8003:8003"  # ИСПРАВЛЕНО: Выводим управление заказами наружу на Mac
     environment:
       - DATABASE_URL=postgresql+psycopg://postgres:postgrespassword@postgres:5432/postgres
       - RABBITMQ_HOST=rabbitmq
@@ -102,7 +108,6 @@ services:
       - nginx_gateway
     networks:
       - ecommerce_network
-
 
 networks:
   ecommerce_network:
